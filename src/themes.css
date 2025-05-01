@@ -59,12 +59,12 @@
   --accent: #4CAF50;
   --text: #2C3E50;
   --text-secondary: #7F8C8D;
-  --success: #2ECC71;
-  --error: #E74C3C;
-  --border: #E0E7E9;
-  --hover: #E8F5E9;
+  --success: #4CAF50;
+  --error: #F44336;
+  --border: #E0E0E0;
+  --hover: #F5F5F5;
   --gradient-start: #4CAF50;
-  --gradient-end: #2ECC71;
+  --gradient-end: #45B649;
   --accent-transparent: rgba(76, 175, 80, 0.1);
   --success-transparent: rgba(76, 175, 80, 0.1);
   --warning-transparent: rgba(255, 152, 0, 0.1);
@@ -128,41 +128,165 @@ h1 {
 .projects-section {
   background-color: var(--surface);
   border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-top: 2rem;
+}
+
+.projects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.projects-header h2 {
+  color: var(--text);
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.add-project-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--accent);
+  color: var(--surface);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.add-project-btn:hover {
+  background-color: var(--success);
+  transform: translateY(-1px);
+}
+
+.project-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.project-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+.project-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-transparent);
+}
+
+.project-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.project-item-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .project-item {
+  padding: 6px 12px;
   background-color: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
   color: var(--text);
+  transition: all 0.2s ease;
 }
 
 .project-item:hover {
   background-color: var(--accent);
-  color: var(--background);
+  color: var(--surface);
+  border-color: var(--accent);
 }
 
 .project-item.selected {
   background-color: var(--accent);
-  color: var(--background);
+  color: var(--surface);
+  border-color: var(--accent);
 }
 
-.add-project-btn,
-.generate-btn,
-.add-btn {
+.delete-project-btn {
+  padding: 4px 8px;
+  background-color: var(--error);
+  color: var(--surface);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  opacity: 0.8;
+}
+
+.delete-project-btn:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* Update form button styles */
+.save-btn, .cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.save-btn {
   background-color: var(--accent);
-  color: var(--background);
+  color: var(--surface);
 }
 
-.add-project-btn:hover,
-.generate-btn:hover,
-.add-btn:hover {
+.save-btn:hover {
   background-color: var(--success);
+}
+
+.cancel-btn {
+  background-color: var(--text-secondary);
+  color: var(--surface);
+}
+
+.cancel-btn:hover {
+  opacity: 0.9;
+}
+
+/* Project select in todo items */
+.project-select {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: var(--text);
+  background-color: var(--surface);
+  cursor: pointer;
+}
+
+.project-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-transparent);
 }
 
 .todo-input,
 .goal-input,
-.project-input,
-.edit-input,
-.project-select {
+.edit-input {
   background-color: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
@@ -170,9 +294,7 @@ h1 {
 
 .todo-input:focus,
 .goal-input:focus,
-.project-input:focus,
-.edit-input:focus,
-.project-select:focus {
+.edit-input:focus {
   border-color: var(--accent);
 }
 
@@ -270,4 +392,68 @@ h1 {
 .theme-button.lavender-mist {
   background-color: #9C27B0;
   color: #F8F0FF;
+}
+
+/* Additional Button Styles */
+.generate-btn,
+.add-btn {
+  background-color: var(--accent);
+  color: var(--surface);
+}
+
+.generate-btn:hover,
+.add-btn:hover {
+  background-color: var(--success);
+}
+
+/* Update the todo form and button styles */
+.todo-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.todo-form button[type="submit"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  height: 42px;
+  background-color: var(--accent);
+  color: var(--surface);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.todo-form button[type="submit"]:hover {
+  background-color: var(--success);
+  transform: translateY(-1px);
+}
+
+.todo-input {
+  flex: 1;
+  padding: 0 16px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+.date-input {
+  min-width: 120px;
+  padding: 0 12px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background-color: var(--surface);
+  color: var(--text);
+  cursor: pointer;
 }

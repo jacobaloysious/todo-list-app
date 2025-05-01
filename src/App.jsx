@@ -40,17 +40,13 @@ export default function App() {
   });
 
   const themes = {
-    light: ['spring-breeze', 'sunset-gold', 'lavender-mist'],
-    dark: ['midnight-ocean', 'dark-forest', 'dark-amethyst']
+    light: ['spring-breeze', 'sunset-gold', 'lavender-mist']
   };
 
   const themeDisplayNames = {
     'spring-breeze': 'Spring Breeze',
     'sunset-gold': 'Sunset Gold',
-    'lavender-mist': 'Lavender Mist',
-    'midnight-ocean': 'Midnight Ocean',
-    'dark-forest': 'Dark Forest',
-    'dark-amethyst': 'Dark Amethyst'
+    'lavender-mist': 'Lavender Mist'
   };
 
   const handleThemeChange = (e) => {
@@ -242,20 +238,11 @@ export default function App() {
           onChange={handleThemeChange}
           value={theme}
         >
-          <optgroup label="Light Themes">
-            {themes.light.map(themeKey => (
-              <option key={themeKey} value={themeKey}>
-                {themeDisplayNames[themeKey]}
-              </option>
-            ))}
-          </optgroup>
-          <optgroup label="Dark Themes">
-            {themes.dark.map(themeKey => (
-              <option key={themeKey} value={themeKey}>
-                {themeDisplayNames[themeKey]}
-              </option>
-            ))}
-          </optgroup>
+          {themes.light.map(themeKey => (
+            <option key={themeKey} value={themeKey}>
+              {themeDisplayNames[themeKey]}
+            </option>
+          ))}
         </select>
       </div>
       <div className="container">
@@ -286,62 +273,33 @@ export default function App() {
           </form>
         </div>
 
-        <div className="projects-section">
-          <div className="projects-header">
-            <h2>Projects</h2>
-            <button 
-              className="add-project-btn"
-              onClick={() => setShowProjectForm(true)}
-            >
-              <FontAwesomeIcon icon={faFolderPlus} />
-              Add Project
-            </button>
-          </div>
-
-          {showProjectForm && (
-            <form onSubmit={addProject} className="project-form">
-              <input
-                value={newProjectName}
-                onChange={e => setNewProjectName(e.target.value)}
-                placeholder="Project name..."
-                className="project-input"
-              />
-              <button type="submit" className="save-btn">Save</button>
-              <button 
-                type="button" 
-                className="cancel-btn"
-                onClick={() => setShowProjectForm(false)}
-              >
-                Cancel
-              </button>
-            </form>
+        <form onSubmit={addTodo} className="todo-form">
+          <input
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            placeholder="Add a new todo..."
+            className="todo-input"
+          />
+          <select
+            value={selectedDate}
+            onChange={e => setSelectedDate(e.target.value)}
+            className="date-input"
+          >
+            <option value="">No Date</option>
+            <option value="today">Today</option>
+            <option value="someday">Someday</option>
+            <option value={customDate || ''}>Custom Date</option>
+          </select>
+          {selectedDate === customDate && (
+            <input
+              type="date"
+              value={customDate}
+              onChange={e => setCustomDate(e.target.value)}
+              className="date-input"
+            />
           )}
-
-          <div className="project-list">
-            <button 
-              className={`project-item ${selectedProject === null ? 'selected' : ''}`}
-              onClick={() => setSelectedProject(null)}
-            >
-              All Todos
-            </button>
-            {projects.map(project => (
-              <div key={project.id} className="project-item-container">
-                <button
-                  className={`project-item ${selectedProject === project.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedProject(project.id)}
-                >
-                  {project.name}
-                </button>
-                <button 
-                  className="delete-project-btn"
-                  onClick={() => deleteProject(project.id)}
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+          <button type="submit">Add Todo</button>
+        </form>
 
         <div className="filters-section">
           <div className="date-filter">
@@ -371,34 +329,6 @@ export default function App() {
           <p>Completed: {filteredTodos.filter(todo => todo.completed).length}</p>
           <p>Pending: {filteredTodos.filter(todo => !todo.completed).length}</p>
         </div>
-        
-        <form onSubmit={addTodo} className="todo-form">
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            placeholder="Add a new todo..."
-            className="todo-input"
-          />
-          <select
-            value={selectedDate}
-            onChange={e => setSelectedDate(e.target.value)}
-            className="date-input"
-          >
-            <option value="">No Date</option>
-            <option value="today">Today</option>
-            <option value="someday">Someday</option>
-            <option value={customDate || ''}>Custom Date</option>
-          </select>
-          {selectedDate === customDate && (
-            <input
-              type="date"
-              value={customDate}
-              onChange={e => setCustomDate(e.target.value)}
-              className="date-input"
-            />
-          )}
-          <button type="submit">Add Todo</button>
-        </form>
 
         <ul className="todo-list">
           {filteredTodos.map(todo => (
@@ -479,6 +409,63 @@ export default function App() {
             </li>
           ))}
         </ul>
+
+        <div className="projects-section">
+          <div className="projects-header">
+            <h2>Projects</h2>
+            <button 
+              className="add-project-btn"
+              onClick={() => setShowProjectForm(true)}
+            >
+              <FontAwesomeIcon icon={faFolderPlus} />
+              Add Project
+            </button>
+          </div>
+
+          {showProjectForm && (
+            <form onSubmit={addProject} className="project-form">
+              <input
+                value={newProjectName}
+                onChange={e => setNewProjectName(e.target.value)}
+                placeholder="Project name..."
+                className="project-input"
+              />
+              <button type="submit" className="save-btn">Save</button>
+              <button 
+                type="button" 
+                className="cancel-btn"
+                onClick={() => setShowProjectForm(false)}
+              >
+                Cancel
+              </button>
+            </form>
+          )}
+
+          <div className="project-list">
+            <button 
+              className={`project-item ${selectedProject === null ? 'selected' : ''}`}
+              onClick={() => setSelectedProject(null)}
+            >
+              All Todos
+            </button>
+            {projects.map(project => (
+              <div key={project.id} className="project-item-container">
+                <button
+                  className={`project-item ${selectedProject === project.id ? 'selected' : ''}`}
+                  onClick={() => setSelectedProject(project.id)}
+                >
+                  {project.name}
+                </button>
+                <button 
+                  className="delete-project-btn"
+                  onClick={() => deleteProject(project.id)}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   );
