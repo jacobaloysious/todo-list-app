@@ -179,7 +179,7 @@ export default function App() {
     }
   };
 
-  const handleGenerateTasks = async (goal) => {
+  const handleGenerateTasks = async () => {
     try {
       setIsGenerating(true);
       const generatedTasks = await generateTasks(goal);
@@ -298,46 +298,35 @@ export default function App() {
           />
         )}
         <div className="ai-task-generator">
-          <div className="ai-task-generator-header">
-            <h2>
-              <FontAwesomeIcon icon={faMagicWandSparkles} />
-              AI Task Generator
-            </h2>
-          </div>
-          <div className="generate-form">
-            <div className="generate-form-content">
-              <div className="goal-input-group">
-                <label htmlFor="goal">What would you like to achieve?</label>
-                <textarea
-                  id="goal"
-                  className="goal-input"
-                  value={goal}
-                  onChange={(e) => setGoal(e.target.value)}
-                  placeholder="Enter your goal or task description..."
-                  disabled={isGenerating}
-                />
-              </div>
-              <div className="generate-button-container">
-                <button
-                  className="generate-button"
-                  onClick={handleGenerateTasks}
-                  disabled={!goal.trim() || isGenerating}
-                >
-                  {isGenerating ? (
-                    <>
-                      <FontAwesomeIcon icon={faSpinner} className="loading-spinner" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <FontAwesomeIcon icon={faMagicWandSparkles} />
-                      Generate Tasks
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
+          <form className="generate-form" onSubmit={(e) => {
+            e.preventDefault();
+            handleGenerateTasks();
+          }}>
+            <textarea
+              className="goal-input"
+              value={goal}
+              onChange={(e) => setGoal(e.target.value)}
+              placeholder="Enter your goal to generate tasks..."
+              disabled={isGenerating}
+            />
+            <button
+              type="submit"
+              className="generate-button"
+              disabled={!goal.trim() || isGenerating}
+            >
+              {isGenerating ? (
+                <>
+                  <FontAwesomeIcon icon={faSpinner} className="loading-spinner" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faMagicWandSparkles} />
+                  Generate Tasks
+                </>
+              )}
+            </button>
+          </form>
         </div>
 
         <form onSubmit={handleAddTodo} className="todo-form">

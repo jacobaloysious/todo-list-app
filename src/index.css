@@ -44,70 +44,30 @@ h1 {
 }
 
 .ai-task-generator {
-  margin: 2rem 0;
+  margin: 1rem 0;
+  padding: 1rem 1.5rem;
   background-color: var(--surface);
   border-radius: 12px;
   border: 1px solid var(--border);
   box-shadow: 0 2px 4px var(--accent-transparent);
-  overflow: hidden;
-}
-
-.ai-task-generator-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--border);
-  background-color: var(--hover);
-}
-
-.ai-task-generator-header h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.ai-task-generator-header h2 svg {
-  color: var(--accent);
-  font-size: 1.1rem;
 }
 
 .generate-form {
-  padding: 1.5rem;
-}
-
-.generate-form-content {
   display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.goal-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.goal-input-group label {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--text);
+  gap: 1rem;
+  align-items: flex-start;
 }
 
 .goal-input {
-  width: 100%;
-  padding: 1rem;
-  min-height: 120px;
+  flex: 1;
+  padding: 0.75rem 1rem;
+  min-height: 42px;
   border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 0.95rem;
   background-color: var(--surface);
   color: var(--text);
-  resize: vertical;
+  resize: none;
   line-height: 1.5;
   transition: all 0.2s ease;
 }
@@ -116,7 +76,6 @@ h1 {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent-transparent);
-  transform: translateY(-1px);
 }
 
 .goal-input::placeholder {
@@ -130,12 +89,6 @@ h1 {
   opacity: 0.7;
 }
 
-.generate-button-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-}
-
 .generate-button {
   display: flex;
   align-items: center;
@@ -143,7 +96,7 @@ h1 {
   gap: 0.75rem;
   padding: 0 1.5rem;
   height: 42px;
-  min-width: 180px;
+  white-space: nowrap;
   background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
   color: var(--surface);
   border: none;
@@ -152,21 +105,6 @@ h1 {
   font-size: 0.95rem;
   font-weight: 500;
   transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.generate-button::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 150%;
-  height: 150%;
-  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
-  transform: translate(-50%, -50%) scale(0);
-  opacity: 0;
-  transition: transform 0.4s ease, opacity 0.3s ease;
 }
 
 .generate-button:hover:not(:disabled) {
@@ -176,12 +114,6 @@ h1 {
 
 .generate-button:active:not(:disabled) {
   transform: translateY(0);
-}
-
-.generate-button:active:not(:disabled)::after {
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 1;
-  transition: 0s;
 }
 
 .generate-button:disabled {
