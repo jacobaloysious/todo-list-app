@@ -10,13 +10,13 @@ import {
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { generateTasks } from './services/taskGenerator';
-import { getInitialProjects, saveProjects, getInitialTodos, saveTodos } from './services/projectService';
+import { todoApi, projectApi } from './services/api';
 import './themes.css';
 import Banner from './components/Banner';
 
 export default function App() {
-  const [todos, setTodos] = useState(getInitialTodos);
-  const [projects, setProjects] = useState(getInitialProjects);
+  const [todos, setTodos] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [input, setInput] = useState('');
   const [editId, setEditId] = useState(null);
   const [editText, setEditText] = useState('');
@@ -49,68 +49,130 @@ export default function App() {
     'lavender-mist': 'Lavender Mist'
   };
 
-  const handleThemeChange = (e) => {
-    const selectedTheme = e.target.value;
-    setTheme(selectedTheme);
+  // Format date to YYYY-MM-DD
+  const formatDate = (date) => {
+    if (date === 'today') {
+      return new Date().toISOString().split('T')[0];
+    }
+    return date;
   };
 
+  // Fetch initial data
   useEffect(() => {
-    document.documentElement.className = `theme-${theme}`;
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  useEffect(() => {
-    saveTodos(todos);
-  }, [todos]);
-
-  useEffect(() => {
-    saveProjects(projects);
-  }, [projects]);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'spring-breeze';
-    document.documentElement.className = `theme-${savedTheme}`;
+    const fetchData = async () => {
+      try {
+        const [todosData, projectsData] = await Promise.all([
+          todoApi.getAllTodos(),
+          projectApi.getAllProjects()
+        ]);
+        setTodos(todosData);
+        setProjects(projectsData);
+      } catch (err) {
+        showBanner('Failed to load data', 'error');
+      }
+    };
+    fetchData();
   }, []);
 
-  const addTodo = (e) => {
+  const showBanner = (message, type = 'info') => {
+    setBanner({ show: true, message, type });
+    setTimeout(() => setBanner({ show: false, message: '', type: 'info' }), 3000);
+  };
+
+  const handleAddTodo = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-    setTodos([...todos, { 
-      id: Date.now(), 
-      text: input, 
-      completed: false,
-      projectId: selectedProject,
-      date: selectedDate || null
-    }]);
-    setInput('');
-    setSelectedDate('');
-    showBanner('Todo added successfully!', 'success');
+
+    try {
+      const date = selectedDate === 'custom' ? customDate : selectedDate;
+      console.log('Adding todo:', { 
+        text: input.trim(), 
+        projectId: selectedProject, 
+        date: formatDate(date) 
+      });
+      
+      const newTodo = await todoApi.createTodo(
+        input.trim(),
+        selectedProject,
+        formatDate(date)
+      );
+      
+      console.log('Todo added successfully:', newTodo);
+      setTodos(prev => [...prev, newTodo]);
+      setInput('');
+      setSelectedDate('');
+      setCustomDate('');
+      showBanner('Todo added successfully', 'success');
+    } catch (err) {
+      console.error('Error in handleAddTodo:', err);
+      showBanner('Failed to add todo', 'error');
+    }
   };
 
-  const deleteTodo = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id));
-    showBanner('Todo deleted', 'warning');
+  const handleToggleTodo = async (id) => {
+    try {
+      const todo = todos.find(t => t._id === id);
+      const updatedTodo = await todoApi.updateTodo(id, { completed: !todo.completed });
+      setTodos(prev => prev.map(t => t._id === id ? updatedTodo : t));
+    } catch (err) {
+      showBanner('Failed to update todo', 'error');
+    }
   };
 
-  const toggleTodo = (id) => {
-    setTodos(todos.map(todo => todo.id === id ? { ...todo, completed: !todo.completed } : todo));
+  const handleDeleteTodo = async (id) => {
+    try {
+      await todoApi.deleteTodo(id);
+      setTodos(prev => prev.filter(todo => todo._id !== id));
+      showBanner('Todo deleted successfully', 'success');
+    } catch (err) {
+      showBanner('Failed to delete todo', 'error');
+    }
   };
 
-  const startEdit = (id, text, date) => {
-    setEditId(id);
-    setEditText(text);
-    setSelectedDate(date || '');
+  const handleEditTodo = async (id) => {
+    if (editId === id) {
+      try {
+        const updatedTodo = await todoApi.updateTodo(id, { text: editText });
+        setTodos(prev => prev.map(todo => todo._id === id ? updatedTodo : todo));
+        setEditId(null);
+        setEditText('');
+        showBanner('Todo updated successfully', 'success');
+      } catch (err) {
+        showBanner('Failed to update todo', 'error');
+      }
+    } else {
+      const todo = todos.find(t => t._id === id);
+      setEditId(id);
+      setEditText(todo.text);
+    }
   };
 
-  const saveEdit = (id) => {
-    setTodos(todos.map(todo => 
-      todo.id === id 
-        ? { ...todo, text: editText, date: selectedDate || null }
-        : todo
-    ));
-    setEditId(null);
-    setEditText('');
-    setSelectedDate('');
+  const handleAddProject = async (e) => {
+    e.preventDefault();
+    if (!newProjectName.trim()) return;
+
+    try {
+      const newProject = await projectApi.createProject(newProjectName.trim());
+      setProjects(prev => [...prev, newProject]);
+      setNewProjectName('');
+      setShowProjectForm(false);
+      showBanner('Project created successfully', 'success');
+    } catch (err) {
+      showBanner('Failed to create project', 'error');
+    }
+  };
+
+  const handleDeleteProject = async (id) => {
+    try {
+      await projectApi.deleteProject(id);
+      setProjects(prev => prev.filter(project => project._id !== id));
+      if (selectedProject === id) {
+        setSelectedProject(null);
+      }
+      showBanner('Project deleted successfully', 'success');
+    } catch (err) {
+      showBanner('Failed to delete project', 'error');
+    }
   };
 
   const handleGenerateTasks = async (e) => {
@@ -143,50 +205,46 @@ export default function App() {
     }
   };
 
-  const addProject = (e) => {
-    e.preventDefault();
-    if (!newProjectName.trim()) return;
-    
-    const newProject = {
-      id: Date.now(),
-      name: newProjectName
-    };
-    
-    setProjects([...projects, newProject]);
-    setNewProjectName('');
-    setShowProjectForm(false);
+  const handleThemeChange = (e) => {
+    const selectedTheme = e.target.value;
+    setTheme(selectedTheme);
   };
 
-  const deleteProject = (projectId) => {
-    // Remove project
-    setProjects(projects.filter(p => p.id !== projectId));
-    // Remove project association from todos
-    setTodos(todos.map(todo => 
-      todo.projectId === projectId 
-        ? { ...todo, projectId: null }
-        : todo
-    ));
-    if (selectedProject === projectId) {
-      setSelectedProject(null);
-    }
+  useEffect(() => {
+    document.documentElement.className = `theme-${theme}`;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const addTodo = (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    handleAddTodo(e);
+  };
+
+  const deleteTodo = (id) => {
+    handleDeleteTodo(id);
+  };
+
+  const toggleTodo = (id) => {
+    handleToggleTodo(id);
+  };
+
+  const startEdit = (id, text, date) => {
+    setEditId(id);
+    setEditText(text);
+    setSelectedDate(date || '');
+  };
+
+  const saveEdit = (id) => {
+    handleEditTodo(id);
   };
 
   const moveTodoToProject = (todoId, projectId) => {
     setTodos(todos.map(todo =>
-      todo.id === todoId
+      todo._id === todoId
         ? { ...todo, projectId: projectId }
         : todo
     ));
-  };
-
-  const formatDate = (date) => {
-    if (!date) return '';
-    if (date === 'someday') return 'Someday';
-    if (date === 'today') {
-      const today = new Date();
-      return today.toISOString().split('T')[0];
-    }
-    return date;
   };
 
   const getDisplayDate = (date) => {
@@ -214,20 +272,6 @@ export default function App() {
 
   // Get unique dates from todos for the filter dropdown
   const uniqueDates = [...new Set(todos.filter(todo => todo.date).map(todo => todo.date))].sort();
-
-  // Add this function to show banners
-  const showBanner = (message, type = 'info') => {
-    setBanner({
-      show: true,
-      message,
-      type
-    });
-
-    // Auto-dismiss after 5 seconds
-    setTimeout(() => {
-      setBanner(prev => ({ ...prev, show: false }));
-    }, 5000);
-  };
 
   return (
     <>
@@ -273,7 +317,7 @@ export default function App() {
           </form>
         </div>
 
-        <form onSubmit={addTodo} className="todo-form">
+        <form onSubmit={handleAddTodo} className="todo-form">
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -281,16 +325,33 @@ export default function App() {
             className="todo-input"
           />
           <select
+            value={selectedProject}
+            onChange={e => setSelectedProject(e.target.value)}
+            className="project-select"
+          >
+            <option value="">No Project</option>
+            {projects.map(project => (
+              <option key={project._id} value={project._id}>
+                {project.name}
+              </option>
+            ))}
+          </select>
+          <select
             value={selectedDate}
-            onChange={e => setSelectedDate(e.target.value)}
-            className="date-input"
+            onChange={e => {
+              setSelectedDate(e.target.value);
+              if (e.target.value !== 'custom') {
+                setCustomDate('');
+              }
+            }}
+            className="date-select"
           >
             <option value="">No Date</option>
             <option value="today">Today</option>
             <option value="someday">Someday</option>
-            <option value={customDate || ''}>Custom Date</option>
+            <option value="custom">Custom Date</option>
           </select>
-          {selectedDate === customDate && (
+          {selectedDate === 'custom' && (
             <input
               type="date"
               value={customDate}
@@ -298,7 +359,7 @@ export default function App() {
               className="date-input"
             />
           )}
-          <button type="submit">Add Todo</button>
+          <button type="submit" className="add-button">Add Todo</button>
         </form>
 
         <div className="filters-section">
@@ -332,8 +393,8 @@ export default function App() {
 
         <ul className="todo-list">
           {filteredTodos.map(todo => (
-            <li key={todo.id} className={todo.completed ? 'completed' : ''}>
-              {editId === todo.id ? (
+            <li key={todo._id} className={todo.completed ? 'completed' : ''}>
+              {editId === todo._id ? (
                 <>
                   <input
                     value={editText}
@@ -347,7 +408,7 @@ export default function App() {
                     className="date-input"
                   />
                   <button 
-                    onClick={() => saveEdit(todo.id)} 
+                    onClick={() => saveEdit(todo._id)} 
                     className="icon-btn save-btn"
                     title="Save"
                   >
@@ -366,7 +427,7 @@ export default function App() {
                   <input
                     type="checkbox"
                     checked={todo.completed}
-                    onChange={() => toggleTodo(todo.id)}
+                    onChange={() => toggleTodo(todo._id)}
                     className="todo-checkbox"
                   />
                   <span className="todo-text">
@@ -380,25 +441,25 @@ export default function App() {
                   )}
                   <select
                     value={todo.projectId || ''}
-                    onChange={(e) => moveTodoToProject(todo.id, e.target.value ? Number(e.target.value) : null)}
+                    onChange={(e) => moveTodoToProject(todo._id, e.target.value ? Number(e.target.value) : null)}
                     className="project-select"
                   >
                     <option value="">No Project</option>
                     {projects.map(project => (
-                      <option key={project.id} value={project.id}>
+                      <option key={project._id} value={project._id}>
                         {project.name}
                       </option>
                     ))}
                   </select>
                   <button 
-                    onClick={() => startEdit(todo.id, todo.text, todo.date)} 
+                    onClick={() => startEdit(todo._id, todo.text, todo.date)} 
                     className="icon-btn edit-btn"
                     title="Edit"
                   >
                     <FontAwesomeIcon icon={faPencilAlt} />
                   </button>
                   <button 
-                    onClick={() => deleteTodo(todo.id)} 
+                    onClick={() => deleteTodo(todo._id)} 
                     className="icon-btn delete-btn"
                     title="Delete"
                   >
@@ -423,7 +484,7 @@ export default function App() {
           </div>
 
           {showProjectForm && (
-            <form onSubmit={addProject} className="project-form">
+            <form onSubmit={handleAddProject} className="project-form">
               <input
                 value={newProjectName}
                 onChange={e => setNewProjectName(e.target.value)}
@@ -449,16 +510,16 @@ export default function App() {
               All Todos
             </button>
             {projects.map(project => (
-              <div key={project.id} className="project-item-container">
+              <div key={project._id} className="project-item-container">
                 <button
-                  className={`project-item ${selectedProject === project.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedProject(project.id)}
+                  className={`project-item ${selectedProject === project._id ? 'selected' : ''}`}
+                  onClick={() => setSelectedProject(project._id)}
                 >
                   {project.name}
                 </button>
                 <button 
                   className="delete-project-btn"
-                  onClick={() => deleteProject(project.id)}
+                  onClick={() => handleDeleteProject(project._id)}
                 >
                   ×
                 </button>
