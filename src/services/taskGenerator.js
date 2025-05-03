@@ -34,7 +34,7 @@ export async function generateTasks(goal) {
       messages: [
         {
           role: "system",
-          content: "You are a task breakdown assistant. Generate 3-5 practical, actionable subtasks for the given goal. Format your response as a JSON array of objects, each with a 'text' property. Example: [{\"text\": \"Task 1\"}, {\"text\": \"Task 2\"}]"
+          content: "You are a task breakdown assistant. Generate 3-5 practical, actionable subtasks for the given goal. Return ONLY a JSON object with a 'tasks' array containing objects with 'text' properties. Example: {\"tasks\": [{\"text\": \"Task 1\"}, {\"text\": \"Task 2\"}]}"
         },
         {
           role: "user",
@@ -47,19 +47,38 @@ export async function generateTasks(goal) {
       response_format: { type: "json_object" }
     });
 
-    console.log('OpenAI Response:', completion.choices[0].message.content);
+    console.log('Raw OpenAI Response:', completion.choices[0].message.content);
     
-    const parsedResponse = JSON.parse(completion.choices[0].message.content);
-    if (!Array.isArray(parsedResponse.tasks)) {
-      throw new Error('Invalid response format from OpenAI');
+    try {
+      const parsedResponse = JSON.parse(completion.choices[0].message.content);
+      console.log('Parsed Response:', parsedResponse);
+      
+      if (!parsedResponse.tasks || !Array.isArray(parsedResponse.tasks)) {
+        console.error('Invalid response structure:', parsedResponse);
+        throw new Error('Invalid response format: missing tasks array');
+      }
+      
+      // Validate each task has a text property
+      const validTasks = parsedResponse.tasks.every(task => 
+        task && typeof task === 'object' && typeof task.text === 'string'
+      );
+      
+      if (!validTasks) {
+        console.error('Invalid task format in response:', parsedResponse.tasks);
+        throw new Error('Invalid task format: missing text property');
+      }
+      
+      return parsedResponse.tasks;
+    } catch (parseError) {
+      console.error('Error parsing OpenAI response:', parseError);
+      throw new Error('Failed to parse OpenAI response');
     }
-    
-    return parsedResponse.tasks;
   } catch (error) {
-    console.error('Error details:', {
+    console.error('Error generating tasks:', {
       message: error.message,
       response: error.response?.data,
-      status: error.response?.status
+      status: error.response?.status,
+      stack: error.stack
     });
 
     // If API fails, use mock response
