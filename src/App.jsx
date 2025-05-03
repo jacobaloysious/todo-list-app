@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faMagicWandSparkles, 
@@ -8,7 +8,9 @@ import {
   faTrash,
   faCheck,
   faTimes,
-  faSpinner
+  faSpinner,
+  faListCheck,
+  faFolder
 } from '@fortawesome/free-solid-svg-icons';
 import { generateTasks } from './services/taskGenerator';
 import { todoApi, projectApi } from './services/api';
@@ -39,6 +41,7 @@ export default function App() {
     message: '',
     type: 'info'
   });
+  const [searchQuery, setSearchQuery] = useState('');
 
   const themes = {
     light: ['spring-breeze', 'sunset-gold', 'lavender-mist']
@@ -260,20 +263,12 @@ export default function App() {
   };
 
   // Filter todos based on selected project and date
-  const filteredTodos = todos
-    .filter(todo => {
-      // Filter by project
-      if (selectedProject && todo.projectId !== selectedProject) return false;
-      
-      // Filter by date
-      if (dateFilter) {
-        if (dateFilter === 'today' && todo.date !== formatDate('today')) return false;
-        if (dateFilter === 'someday' && todo.date !== 'someday') return false;
-        if (dateFilter !== 'today' && dateFilter !== 'someday' && todo.date !== dateFilter) return false;
-      }
-      
-      return true;
-    });
+  const filteredTodos = useMemo(() => {
+    return todos.filter(todo => 
+      todo.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (todo.project && todo.project.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  }, [todos, searchQuery]);
 
   // Get unique dates from todos for the filter dropdown
   const uniqueDates = [...new Set(todos.map(todo => todo.date))].sort();
@@ -303,29 +298,46 @@ export default function App() {
           />
         )}
         <div className="ai-task-generator">
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            if (!goal.trim()) return;
-            handleGenerateTasks(goal);
-          }} className="generate-form">
-            <div className="input-group">
-              <input
-                type="text"
-                value={goal}
-                onChange={(e) => setGoal(e.target.value)}
-                placeholder="Enter a goal to break down into tasks..."
-                className="goal-input"
-              />
-              <button type="submit" disabled={isGenerating || !goal.trim()} className="generate-button">
-                {isGenerating ? (
-                  <FontAwesomeIcon icon={faSpinner} spin />
-                ) : (
-                  <FontAwesomeIcon icon={faMagicWandSparkles} />
-                )}
-                Generate Tasks
-              </button>
+          <div className="ai-task-generator-header">
+            <h2>
+              <FontAwesomeIcon icon={faMagicWandSparkles} />
+              AI Task Generator
+            </h2>
+          </div>
+          <div className="generate-form">
+            <div className="generate-form-content">
+              <div className="goal-input-group">
+                <label htmlFor="goal">What would you like to achieve?</label>
+                <textarea
+                  id="goal"
+                  className="goal-input"
+                  value={goal}
+                  onChange={(e) => setGoal(e.target.value)}
+                  placeholder="Enter your goal or task description..."
+                  disabled={isGenerating}
+                />
+              </div>
+              <div className="generate-button-container">
+                <button
+                  className="generate-button"
+                  onClick={handleGenerateTasks}
+                  disabled={!goal.trim() || isGenerating}
+                >
+                  {isGenerating ? (
+                    <>
+                      <FontAwesomeIcon icon={faSpinner} className="loading-spinner" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={faMagicWandSparkles} />
+                      Generate Tasks
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
-          </form>
+          </div>
         </div>
 
         <form onSubmit={handleAddTodo} className="todo-form">
@@ -396,91 +408,104 @@ export default function App() {
           </div>
         </div>
 
-        <div className="todo-summary">
-          <p>Total Todos: {filteredTodos.length}</p>
-          <p>Completed: {filteredTodos.filter(todo => todo.completed).length}</p>
-          <p>Pending: {filteredTodos.filter(todo => !todo.completed).length}</p>
-        </div>
-
-        <ul className="todo-list">
-          {filteredTodos.map(todo => (
-            <li key={todo._id} className={todo.completed ? 'completed' : ''}>
-              {editId === todo._id ? (
-                <>
-                  <input
-                    value={editText}
-                    onChange={e => setEditText(e.target.value)}
-                    className="edit-input"
-                  />
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={e => setSelectedDate(e.target.value)}
-                    className="date-input"
-                  />
-                  <button 
-                    onClick={() => saveEdit(todo._id)} 
-                    className="icon-btn save-btn"
-                    title="Save"
-                  >
-                    <FontAwesomeIcon icon={faCheck} />
-                  </button>
-                  <button 
-                    onClick={() => setEditId(null)} 
-                    className="icon-btn cancel-btn"
-                    title="Cancel"
-                  >
-                    <FontAwesomeIcon icon={faTimes} />
-                  </button>
-                </>
-              ) : (
-                <>
-                  <input
-                    type="checkbox"
-                    checked={todo.completed}
-                    onChange={() => toggleTodo(todo._id)}
-                    className="todo-checkbox"
-                  />
-                  <span className="todo-text">
-                    {todo.text}
-                  </span>
-                  {todo.date && (
-                    <span className="todo-date">
-                      <FontAwesomeIcon icon={faCalendarAlt} />
-                      {getDisplayDate(todo.date)}
-                    </span>
+        <div className="todo-section">
+          <div className="todo-section-header">
+            <h2>
+              <FontAwesomeIcon icon={faListCheck} />
+              Todo List
+            </h2>
+          </div>
+          <div className="todo-search">
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search todos..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="todo-list-container">
+            <ul className="todo-list">
+              {filteredTodos.map(todo => (
+                <li key={todo._id} className={todo.completed ? 'completed' : ''}>
+                  {editId === todo._id ? (
+                    <>
+                      <input
+                        value={editText}
+                        onChange={e => setEditText(e.target.value)}
+                        className="edit-input"
+                      />
+                      <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={e => setSelectedDate(e.target.value)}
+                        className="date-input"
+                      />
+                      <button 
+                        onClick={() => saveEdit(todo._id)} 
+                        className="icon-btn save-btn"
+                        title="Save"
+                      >
+                        <FontAwesomeIcon icon={faCheck} />
+                      </button>
+                      <button 
+                        onClick={() => setEditId(null)} 
+                        className="icon-btn cancel-btn"
+                        title="Cancel"
+                      >
+                        <FontAwesomeIcon icon={faTimes} />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <input
+                        type="checkbox"
+                        checked={todo.completed}
+                        onChange={() => toggleTodo(todo._id)}
+                        className="todo-checkbox"
+                      />
+                      <span className="todo-text">
+                        {todo.text}
+                      </span>
+                      {todo.date && (
+                        <span className="todo-date">
+                          <FontAwesomeIcon icon={faCalendarAlt} />
+                          {getDisplayDate(todo.date)}
+                        </span>
+                      )}
+                      <select
+                        value={todo.projectId?.toString() || ''}
+                        onChange={(e) => moveTodoToProject(todo._id, e.target.value ? e.target.value : null)}
+                        className="project-select"
+                      >
+                        <option value="">No Project</option>
+                        {projects.map(project => (
+                          <option key={project._id} value={project._id.toString()}>
+                            {project.name}
+                          </option>
+                        ))}
+                      </select>
+                      <button 
+                        onClick={() => startEdit(todo._id, todo.text, todo.date)} 
+                        className="icon-btn edit-btn"
+                        title="Edit"
+                      >
+                        <FontAwesomeIcon icon={faPencilAlt} />
+                      </button>
+                      <button 
+                        onClick={() => deleteTodo(todo._id)} 
+                        className="icon-btn delete-btn"
+                        title="Delete"
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </>
                   )}
-                  <select
-                    value={todo.projectId?.toString() || ''}
-                    onChange={(e) => moveTodoToProject(todo._id, e.target.value ? e.target.value : null)}
-                    className="project-select"
-                  >
-                    <option value="">No Project</option>
-                    {projects.map(project => (
-                      <option key={project._id} value={project._id.toString()}>
-                        {project.name}
-                      </option>
-                    ))}
-                  </select>
-                  <button 
-                    onClick={() => startEdit(todo._id, todo.text, todo.date)} 
-                    className="icon-btn edit-btn"
-                    title="Edit"
-                  >
-                    <FontAwesomeIcon icon={faPencilAlt} />
-                  </button>
-                  <button 
-                    onClick={() => deleteTodo(todo._id)} 
-                    className="icon-btn delete-btn"
-                    title="Delete"
-                  >
-                    <FontAwesomeIcon icon={faTrash} />
-                  </button>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
 
         <div className="projects-section">
           <div className="projects-header">
