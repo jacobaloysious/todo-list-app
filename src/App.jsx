@@ -7,7 +7,8 @@ import {
   faPencilAlt,
   faTrash,
   faCheck,
-  faTimes
+  faTimes,
+  faSpinner
 } from '@fortawesome/free-solid-svg-icons';
 import { generateTasks } from './services/taskGenerator';
 import { todoApi, projectApi } from './services/api';
@@ -175,33 +176,37 @@ export default function App() {
     }
   };
 
-  const handleGenerateTasks = async (e) => {
-    e.preventDefault();
-    if (!goal.trim()) return;
-    
-    setIsGenerating(true);
-    setError('');
-    
+  const handleGenerateTasks = async (goal) => {
     try {
+      setIsGenerating(true);
       const generatedTasks = await generateTasks(goal);
-      const newTodos = generatedTasks.map(task => ({
-        id: Date.now() + Math.random(),
-        text: task.text,
-        completed: false,
-        projectId: selectedProject,
-        date: selectedDate || null
-      }));
+      console.log('Generated tasks:', generatedTasks);
+
+      // Create all tasks in sequence
+      const createdTasks = await Promise.all(
+        generatedTasks.map(async (task) => {
+          try {
+            const newTodo = await todoApi.createTodo(task.text);
+            console.log('Created todo:', newTodo);
+            return newTodo;
+          } catch (error) {
+            console.error('Error creating todo:', error);
+            return null;
+          }
+        })
+      );
+
+      // Filter out any failed creations and update state
+      const successfulTasks = createdTasks.filter(task => task !== null);
+      setTodos(prevTodos => [...prevTodos, ...successfulTasks]);
       
-      setTodos([...todos, ...newTodos]);
-      setGoal('');
-      setSelectedDate('');
-      showBanner('Tasks generated successfully!', 'success');
-    } catch (err) {
-      console.error('Generation error:', err);
-      setError(err.message || 'Failed to generate tasks. Please try again.');
-      showBanner('Failed to generate tasks', 'error');
-    } finally {
       setIsGenerating(false);
+      setGoal('');
+      showBanner('Tasks generated successfully!', 'success');
+    } catch (error) {
+      console.error('Error generating tasks:', error);
+      setIsGenerating(false);
+      showBanner('Failed to generate tasks', 'error');
     }
   };
 
@@ -298,22 +303,28 @@ export default function App() {
           />
         )}
         <div className="ai-task-generator">
-          <form onSubmit={handleGenerateTasks} className="generate-form">
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (!goal.trim()) return;
+            handleGenerateTasks(goal);
+          }} className="generate-form">
             <div className="input-group">
               <input
                 type="text"
                 value={goal}
                 onChange={(e) => setGoal(e.target.value)}
-                placeholder="Enter a goal (e.g., Plan a birthday party)"
+                placeholder="Enter a goal to break down into tasks..."
                 className="goal-input"
               />
-              <button type="submit" className="generate-btn" disabled={isGenerating}>
-                <FontAwesomeIcon icon={faMagicWandSparkles} />
-                {isGenerating ? 'Generating...' : 'Generate Tasks'}
+              <button type="submit" disabled={isGenerating || !goal.trim()} className="generate-button">
+                {isGenerating ? (
+                  <FontAwesomeIcon icon={faSpinner} spin />
+                ) : (
+                  <FontAwesomeIcon icon={faMagicWandSparkles} />
+                )}
+                Generate Tasks
               </button>
             </div>
-            {isGenerating && <p className="loading-text">Generating tasks...</p>}
-            {error && <p className="error-text">{error}</p>}
           </form>
         </div>
 
