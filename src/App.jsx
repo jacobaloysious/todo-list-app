@@ -374,29 +374,6 @@ export default function App() {
           <button type="submit" className="add-button">Add Todo</button>
         </form>
 
-        <div className="filters-section">
-          <div className="date-filter">
-            <FontAwesomeIcon icon={faCalendarAlt} />
-            <select 
-              value={dateFilter || ''}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="date-select"
-            >
-              <option value="">All Dates</option>
-              <option value="today">Today</option>
-              <option value="someday">Someday</option>
-              {Array.from(new Set(todos.map(todo => todo.date)))
-                .filter(date => date && date !== 'someday' && date !== formatDate('today'))
-                .sort()
-                .map(date => (
-                  <option key={date} value={date}>
-                    {new Date(date).toLocaleDateString()}
-                  </option>
-                ))}
-            </select>
-          </div>
-        </div>
-
         <div className="todo-section">
           <div className="todo-section-header">
             <h2>
@@ -404,14 +381,34 @@ export default function App() {
               Todo List
             </h2>
           </div>
-          <div className="todo-search">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search todos..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="todo-filters">
+            <div className="filter-group">
+              <span className="filter-label">Filter by date:</span>
+              <select
+                className="date-select"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+              >
+                <option value="">All dates</option>
+                <option value="today">Today</option>
+                <option value="someday">Someday</option>
+                {uniqueDates
+                  .filter(date => date !== 'today' && date !== 'someday')
+                  .map(date => (
+                    <option key={date} value={date}>{getDisplayDate(date)}</option>
+                  ))
+                }
+              </select>
+            </div>
+            <div className="filter-group">
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search todos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
           <div className="todo-list-container">
             <ul className="todo-list">
@@ -453,9 +450,7 @@ export default function App() {
                         onChange={() => toggleTodo(todo._id)}
                         className="todo-checkbox"
                       />
-                      <span className="todo-text">
-                        {todo.text}
-                      </span>
+                      <span className="todo-text">{todo.text}</span>
                       {todo.date && (
                         <span className="todo-date">
                           <FontAwesomeIcon icon={faCalendarAlt} />
