@@ -487,25 +487,34 @@ li.completed .todo-text {
 }
 
 .ai-task-generator {
-  margin: 2.5rem 0;
+  margin: 20px 0;
+  padding: 20px;
+  background-color: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.generate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .generate-form .input-group {
   display: flex;
-  gap: 14px;
-  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
 }
 
 .goal-input {
   flex: 1;
-  padding: 0 20px;
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: 0 16px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
   background-color: var(--surface);
   color: var(--text);
-  height: 50px;
-  transition: all 0.2s ease;
 }
 
 .goal-input:focus {
@@ -513,57 +522,35 @@ li.completed .todo-text {
   border-color: var(--accent);
 }
 
-.goal-input::placeholder {
-  color: var(--text-secondary);
+.generate-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px;
+  height: 42px;
+  background: linear-gradient(45deg, #4CAF50, #2196F3);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.generate-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.generate-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
   opacity: 0.7;
 }
 
-.generate-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 0 28px;
-  height: 50px;
-  border: none;
-  border-radius: 8px;
-  background-color: var(--accent);
-  color: var(--surface);
+.generate-button svg {
   font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  min-width: 160px;
-}
-
-.generate-btn svg {
-  font-size: 1.1rem;
-}
-
-.generate-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-.generate-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.loading-text {
-  color: var(--accent);
-  font-size: 0.9rem;
-  margin-top: 1rem;
-  text-align: center;
-}
-
-.error-text {
-  color: var(--error);
-  font-size: 0.9rem;
-  margin-top: 1rem;
-  text-align: center;
 }
 
 .projects-section {
