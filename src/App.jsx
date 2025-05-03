@@ -25,7 +25,7 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
   const [newProjectName, setNewProjectName] = useState('');
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedProject, setSelectedProject] = useState('');
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('theme');
@@ -168,7 +168,7 @@ export default function App() {
       await projectApi.deleteProject(id);
       setProjects(prev => prev.filter(project => project._id !== id));
       if (selectedProject === id) {
-        setSelectedProject(null);
+        setSelectedProject('');
       }
       showBanner('Project deleted successfully', 'success');
     } catch (err) {
@@ -276,7 +276,7 @@ export default function App() {
     });
 
   // Get unique dates from todos for the filter dropdown
-  const uniqueDates = [...new Set(todos.filter(todo => todo.date).map(todo => todo.date))].sort();
+  const uniqueDates = [...new Set(todos.map(todo => todo.date))].sort();
 
   return (
     <>
@@ -336,19 +336,19 @@ export default function App() {
             className="todo-input"
           />
           <select
-            value={selectedProject}
+            value={selectedProject || ''}
             onChange={e => setSelectedProject(e.target.value)}
             className="project-select"
           >
             <option value="">No Project</option>
             {projects.map(project => (
-              <option key={project._id} value={project._id}>
+              <option key={project._id} value={project._id.toString()}>
                 {project.name}
               </option>
             ))}
           </select>
           <select
-            value={selectedDate}
+            value={selectedDate || ''}
             onChange={e => {
               setSelectedDate(e.target.value);
               if (e.target.value !== 'custom') {
@@ -365,7 +365,7 @@ export default function App() {
           {selectedDate === 'custom' && (
             <input
               type="date"
-              value={customDate}
+              value={customDate || ''}
               onChange={e => setCustomDate(e.target.value)}
               className="date-input"
             />
@@ -377,7 +377,7 @@ export default function App() {
           <div className="date-filter">
             <FontAwesomeIcon icon={faCalendarAlt} />
             <select 
-              value={dateFilter}
+              value={dateFilter || ''}
               onChange={(e) => setDateFilter(e.target.value)}
               className="date-select"
             >
@@ -451,13 +451,13 @@ export default function App() {
                     </span>
                   )}
                   <select
-                    value={todo.projectId || ''}
-                    onChange={(e) => moveTodoToProject(todo._id, e.target.value ? Number(e.target.value) : null)}
+                    value={todo.projectId?.toString() || ''}
+                    onChange={(e) => moveTodoToProject(todo._id, e.target.value ? e.target.value : null)}
                     className="project-select"
                   >
                     <option value="">No Project</option>
                     {projects.map(project => (
-                      <option key={project._id} value={project._id}>
+                      <option key={project._id} value={project._id.toString()}>
                         {project.name}
                       </option>
                     ))}
@@ -515,8 +515,8 @@ export default function App() {
 
           <div className="project-list">
             <button 
-              className={`project-item ${selectedProject === null ? 'selected' : ''}`}
-              onClick={() => setSelectedProject(null)}
+              className={`project-item ${selectedProject === '' ? 'selected' : ''}`}
+              onClick={() => setSelectedProject('')}
             >
               All Todos
             </button>
