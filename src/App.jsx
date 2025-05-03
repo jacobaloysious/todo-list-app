@@ -276,18 +276,21 @@ export default function App() {
   return (
     <>
       <div className="app-header">
-        <h1>ToDo'la</h1>
-        <select 
-          className="theme-select"
-          onChange={handleThemeChange}
-          value={theme}
-        >
-          {themes.light.map(themeKey => (
-            <option key={themeKey} value={themeKey}>
-              {themeDisplayNames[themeKey]}
-            </option>
-          ))}
-        </select>
+        <div className="theme-selector">
+          <span className="theme-label">Theme:</span>
+          <select
+            className="theme-select"
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
+          >
+            {themes.light.map(themeKey => (
+              <option key={themeKey} value={themeKey}>
+                {themeDisplayNames[themeKey]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <h1 className="app-title">ToDo'la</h1>
       </div>
       <div className="container">
         {banner.show && (

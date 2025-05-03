@@ -13,9 +13,9 @@ body {
 }
 
 .container {
-  max-width: 900px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0 1.5rem;
   background-color: var(--surface);
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -23,24 +23,63 @@ body {
 }
 
 .app-header {
-  text-align: center;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background: var(--surface);
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  box-shadow: 0 2px 4px var(--accent-transparent);
+  display: flex;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  position: relative;
 }
 
-h1 {
-  margin: 0 0 1rem;
-  font-size: 2.5rem;
-  font-weight: bold;
+.theme-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.theme-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.theme-select {
+  padding: 0.4rem 0.75rem;
+  width: 130px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background-color: var(--surface);
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-select:hover {
+  border-color: var(--accent);
+}
+
+.theme-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-transparent);
+}
+
+.app-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
   background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 2px 2px 4px var(--accent-transparent);
+  white-space: nowrap;
 }
 
 .ai-task-generator {
@@ -252,6 +291,22 @@ h1 {
 .icon-btn:hover {
   background-color: var(--accent-transparent);
   color: var(--accent);
+}
+
+.icon-btn.edit-btn {
+  color: var(--accent);
+}
+
+.icon-btn.delete-btn {
+  color: var(--error);
+}
+
+.icon-btn.save-btn {
+  color: var(--success);
+}
+
+.icon-btn.cancel-btn {
+  color: var(--error);
 }
 
 .projects-section {
@@ -595,22 +650,6 @@ h1 {
 .icon-btn:hover {
   background-color: var(--hover);
   transform: scale(1.1);
-}
-
-.icon-btn.edit-btn {
-  color: var(--accent);
-}
-
-.icon-btn.delete-btn {
-  color: var(--error);
-}
-
-.icon-btn.save-btn {
-  color: var(--success);
-}
-
-.icon-btn.cancel-btn {
-  color: var(--error);
 }
 
 .theme-select {
