@@ -4,7 +4,7 @@ A modern, feature-rich todo list application built with React and Vite, featurin
 
 ## 📱 App Preview
 
-![ToDo'la App Screenshot](public/images/app-preview.png)
+![ToDo'la App Screenshot](public/images/app-preview.svg)
 
 ### Key Features Highlighted:
 
