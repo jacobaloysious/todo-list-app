@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- App Background -->
+  <rect x="0" y="0" width="800" height="600" fill="#f8f9fa"/>
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="800" height="60" fill="#ffffff"/>
+  <text x="400" y="38" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold">ToDo'la</text>
+  <rect x="650" y="15" width="120" height="30" rx="6" fill="#f0f0f0"/>
+  <text x="675" y="35" font-family="Arial" font-size="14">Theme: Light</text>
+  
+  <!-- AI Task Generator -->
+  <rect x="50" y="80" width="700" height="100" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+  <text x="70" y="110" font-family="Arial" font-size="16" font-weight="bold">AI Task Generator</text>
+  <rect x="70" y="120" width="560" height="40" rx="6" fill="#f8f9fa"/>
+  <text x="90" y="145" font-family="Arial" font-size="14" fill="#666">Enter your goal...</text>
+  <rect x="650" y="120" width="80" height="40" rx="6" fill="#4a90e2"/>
+  <text x="670" y="145" font-family="Arial" font-size="14" fill="#fff">Generate</text>
+  
+  <!-- Filters -->
+  <rect x="50" y="200" width="700" height="50" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+  <rect x="70" y="210" width="150" height="30" rx="6" fill="#f8f9fa"/>
+  <text x="90" y="230" font-family="Arial" font-size="14">Date: All</text>
+  <rect x="240" y="210" width="200" height="30" rx="6" fill="#f8f9fa"/>
+  <text x="260" y="230" font-family="Arial" font-size="14">Search todos...</text>
+  
+  <!-- Todo List -->
+  <rect x="50" y="270" width="700" height="250" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+  <text x="70" y="300" font-family="Arial" font-size="16" font-weight="bold">Todo List</text>
+  
+  <!-- Sample Todos -->
+  <rect x="70" y="320" width="660" height="40" rx="6" fill="#f8f9fa" stroke="#e0e0e0"/>
+  <circle cx="90" cy="340" r="10" fill="#4a90e2"/>
+  <text x="120" y="345" font-family="Arial" font-size="14">Complete project documentation</text>
+  
+  <rect x="70" y="370" width="660" height="40" rx="6" fill="#f8f9fa" stroke="#e0e0e0"/>
+  <circle cx="90" cy="390" r="10" fill="none" stroke="#666"/>
+  <text x="120" y="395" font-family="Arial" font-size="14">Review pull requests</text>
+  
+  <!-- Projects Section -->
+  <rect x="50" y="540" width="700" height="40" rx="8" fill="#ffffff" stroke="#e0e0e0"/>
+  <text x="70" y="565" font-family="Arial" font-size="16" font-weight="bold">Projects</text>
+  
+  <!-- Annotations -->
+  <g fill="none" stroke="#ff6b6b" stroke-width="2">
+    <!-- Theme Selector -->
+    <path d="M 650,15 L 730,-10"/>
+    <text x="740" y="-15" font-family="Arial" font-size="12" fill="#ff6b6b">1. Theme Selector</text>
+    
+    <!-- AI Generator -->
+    <path d="M 50,130 L 20,130 L 20,50"/>
+    <text x="30" y="40" font-family="Arial" font-size="12" fill="#ff6b6b">2. AI Task Generator</text>
+    
+    <!-- Filters -->
+    <path d="M 240,210 L 240,180"/>
+    <text x="250" y="170" font-family="Arial" font-size="12" fill="#ff6b6b">3. Smart Filters</text>
+    
+    <!-- Projects -->
+    <path d="M 50,560 L 20,560 L 20,580"/>
+    <text x="30" y="590" font-family="Arial" font-size="12" fill="#ff6b6b">4. Project Management</text>
+    
+    <!-- Todo List -->
+    <path d="M 750,320 L 780,320"/>
+    <text x="790" y="325" font-family="Arial" font-size="12" fill="#ff6b6b">5. Todo List</text>
+  </g>
+</svg>
